@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Card, Button } from 'flowbite-react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux'
@@ -10,6 +10,7 @@ function VerifyOtp() {
     const navigate = useNavigate()
     const otpDetails = useSelector((state) => state.auth.otp);
     const [otp, setOtp] = useState(['1', '2', '3', '4', '5', '6']); // Array to hold each digit of OTP
+    const inputRef = otp.map(v => useRef(null));
 
     const handleChange = (index, value) => {
         const newOtp = [...otp];
@@ -24,9 +25,9 @@ function VerifyOtp() {
             phone: otpDetails.phone,
         })
 
-        if(result.error) {
+        if (result.error) {
             alert(result.error);
-            return ;
+            return;
         }
         const user = result.data.data;
         dispatch(setUser(user));
@@ -39,7 +40,7 @@ function VerifyOtp() {
             // If the OTP is not sent, navigate to the send otp page
             navigate('/');
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [otpDetails]);
 
     return (
@@ -59,15 +60,22 @@ function VerifyOtp() {
                     </span>
 
                     <form className="flex max-w-md flex-col gap-4">
-                        <div className="flex justify-center gap-4 ">
+                        <div className="flex justify-center gap-0">
                             {otp.map((digit, index) => (
                                 <input
+                                    ref={inputRef[index]}
                                     key={index}
                                     type="text"
                                     maxLength={1}
-                                    className="w-12 h-12 text-center border rounded-md m-2"
+                                    className="w-12 h-12 text-center border rounded-md m-1"
                                     value={digit}
-                                    onChange={(e) => handleChange(index, e.target.value)}
+                                    onChange={(e) => {
+                                        handleChange(index, e.target.value);
+                                        if(e.target.value && index !== otp.length - 1 ){
+                                            inputRef[(index + 1) % otp.length].current.focus();
+                                            inputRef[(index + 1) % otp.length].current.select();
+                                        }
+                                    }}
                                 />
                             ))}
                         </div>

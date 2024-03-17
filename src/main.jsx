@@ -29,10 +29,14 @@ const router = createBrowserRouter([
     element: <AuthRoute><ProductList /></AuthRoute>
   },
   {
-    path: "/product-detail",
+    path: "/product-detail/:id",
     element: <ProductDetail></ProductDetail>
   }
-]);
+],
+{
+  basename: "/react-test"
+}
+);
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
